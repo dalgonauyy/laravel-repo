@@ -50,22 +50,24 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDzOr1on7mUGwO4mRSAGwvy9wgC8dVWoEY',
-    appId: '1:470547192109:web:45e3cb672dc1b368091ba4',
-    messagingSenderId: '470547192109',
-    projectId: 'butikdatabase',
-    authDomain: 'butikdatabase.firebaseapp.com',
-    databaseURL: 'https://butikdatabase-default-rtdb.firebaseio.com',
-    storageBucket: 'butikdatabase.firebasestorage.app',
-    measurementId: 'G-EM0SYY9PFG',
+    apiKey: 'AIzaSyCB7hH1pQl814PlBwFbEraera8jIvzkcjg',
+    appId: "1:1047387499063:web:e53f251e6e33083f81edb2",
+    messagingSenderId: '1047387499063',
+    projectId: 'butikgbm',
+    authDomain: 'butikgbm.firebaseapp.com',
+    databaseURL: 'https://butikgbm-default-rtdb.firebaseio.com',
+    storageBucket: 'butikgbm.firebasestorage.app',
+    measurementId: 'G-SVT28XZL9T',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyA6LEbpY4METhbyq_GKtv_YQ1XxJkaTtL0',
-    appId: '1:470547192109:android:3e99706d810f1dcd091ba4',
-    messagingSenderId: '470547192109',
-    projectId: 'butikdatabase',
-    databaseURL: 'https://butikdatabase-default-rtdb.firebaseio.com',
-    storageBucket: 'butikdatabase.firebasestorage.app',
+    apiKey: 'AIzaSyCB7hH1pQl814PlBwFbEraera8jIvzkcjg',
+    appId: "1:1047387499063:web:e53f251e6e33083f81edb2",
+    messagingSenderId: '1047387499063',
+    projectId: 'butikgbm',
+    authDomain: 'butikgbm.firebaseapp.com',
+    databaseURL: 'https://butikgbm-default-rtdb.firebaseio.com',
+    storageBucket: 'butikgbm.firebasestorage.app',
+    measurementId: 'G-SVT28XZL9T',
   );
 }

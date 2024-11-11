@@ -1,169 +1,168 @@
+// ignore_for_file: unused_import
+
 import 'package:flutter/material.dart';
-import 'package:myapp/detail_produk_page.dart';
-import 'package:myapp/keranjang_page.dart';
 import 'package:myapp/notifikasi_page.dart';
 import 'package:myapp/pesan_page.dart';
 import 'package:myapp/profil_page.dart';
+import 'detail_produk_page.dart';
+import 'keranjang_page.dart';
+import 'pemesanan_page.dart'; // Import halaman Pemesanan
+import 'profile_page.dart'; // Import halaman Profil
+import 'product.dart';
 
 class BerandaPage extends StatefulWidget {
-  const BerandaPage({Key? key}) : super(key: key);
-
   @override
-  State<BerandaPage> createState() => _BerandaPageState();
+  _BerandaPageState createState() => _BerandaPageState();
 }
 
 class _BerandaPageState extends State<BerandaPage> {
-  List<Map<String, dynamic>> products = [
-    {
-      'gambar': 'assets/images/dressberanda1.jpeg',
-      'nama': 'Dress Elegan',
-      'deskripsi': 'Dress dengan nuansa elegan membuat 1',
-      'harga': 'Rp 500.000',
-    },
-    {
-      'gambar': 'assets/images/dressberanda2.jpeg',
-      'nama': 'Long Dress',
-      'deskripsi': 'Dress dengan nuansa elegan membuat 2',
-      'harga': 'Rp 300.000',
-    },
-    {
-      'gambar': 'assets/images/dressberanda3.jpeg',
-      'nama': 'Blouse Modern',
-      'deskripsi': 'Dress dengan nuansa elegan membuat 3',
-      'harga': 'Rp 180.000',
-    },
-    {
-      'gambar': 'assets/images/dress8.jpeg',
-      'nama': 'Dress',
-      'deskripsi': 'Dress dengan nuansa elegan membuat 4',
-      'harga': 'Rp 150.000',
-    },
-    // ... tambahkan data produk lainnya
+  List<Product> products = [
+    Product(
+      name: 'Dress Casual',
+      imagePath: 'assets/images/dress7.jpeg',
+      price: 500000,
+      description: 'Casual dress, perfect for daily wear, made from soft cotton material, breathable and comfortable for all-day wear.',
+      rating: 4,
+      reviews: 23,
+      reviewsList: [
+        Review(username: 'Alice', rating: 5, comment: 'Love it! So comfortable and stylish.'),
+        Review(username: 'Bob', rating: 4, comment: 'Great dress for casual wear, but I wish the fabric was a bit thicker.'),
+        Review(username: 'Carla', rating: 3, comment: 'The dress is nice but the size was a bit off for me.')
+      ]
+    ),
+    Product(
+      name: 'Dress Formal',
+      imagePath: 'assets/images/dress8.jpeg',
+      price: 750000,
+      description: 'Elegant dress for formal events, made from satin fabric that shines beautifully. Perfect for weddings or evening parties.',
+      rating: 5,
+      reviews: 12,
+      reviewsList: [
+        Review(username: 'David', rating: 5, comment: 'Absolutely stunning! Fits perfectly and looks amazing at night events.'),
+        Review(username: 'Emma', rating: 5, comment: 'This dress was a showstopper at the gala I attended! Highly recommend!'),
+      ]
+    ),
   ];
+
+  List<Product> cart = [];
+
+  void addToCart(Product product) {
+    setState(() {
+      cart.add(product);
+    });
+  }
+
+  void _onCheckout(List<Product> cart) {
+    setState(() {
+      this.cart.clear(); // Menghapus semua produk dari keranjang setelah checkout
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Glam Boutique'),
+        title: const Text('Beranda'),
         actions: [
+          
+          // Ikon Notifikasi
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => NotifikasiPage()));
-              // Navigator.pushNamed(context, route)
-              // Aksi saat ikon notifikasi ditekan
+                                                                         Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => NotificationPage()));
+
+              // Tindakan untuk membuka halaman notifikasi
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notifikasi')));
             },
           ),
+          // Ikon Pesan
           IconButton(
             icon: const Icon(Icons.message),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PesanPage()));
-              // Aksi saat ikon pesan ditekan
+                                                                           Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MessagePage()));
+              // Tindakan untuk membuka halaman pesan
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pesan')));
             },
           ),
+          // Ikon Pemesanan
+          IconButton(
+            icon: const Icon(Icons.list_alt),
+            onPressed: () {
+              // Navigasi ke halaman pemesanan
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PemesananPage(orders: [],), // Ganti dengan halaman Pemesanan Anda
+                ),
+              );
+            },
+          ),
+          // Ikon Keranjang
           IconButton(
             icon: const Icon(Icons.shopping_cart),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => KeranjangPage()));
-              // Aksi saat ikon keranjang ditekan
+              // Navigasi ke halaman keranjang
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => KeranjangPage(cart: cart, onCheckout: _onCheckout), // Ganti dengan halaman Keranjang Anda
+                ), //MatwrialPageRoute
+              );
             },
           ),
+          // Ikon Profil
           IconButton(
-            icon: const Icon(Icons.person),
+            icon: const Icon(Icons.account_circle),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilPage()));
-              // Aksi saat ikon profil ditekan
+              // Navigasi ke halaman profil
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilPage(), // Ganti dengan halaman Profil Anda
+                ),
+              );
             },
           ),
         ],
       ),
-      body: ListView(
-        children: [
-          // Banner Iklan
-          Image.asset(
-            'assets/images/banner.jpeg', // Ganti dengan path gambar banner Anda
-            width: double.infinity,
-            height: 200,
-            fit: BoxFit.cover,
-          ),
-          // Daftar Produk
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Koleksi Terbaru',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+      body: GridView.builder(
+        padding: const EdgeInsets.all(10),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          final product = products[index];
+          return GestureDetector(
+            onTap: () {
+              // Navigasi ke halaman detail produk saat produk ditekan
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailProdukPage(
+                    product: product,
+                    onAddToCart: addToCart,
                   ),
                 ),
-                const SizedBox(height: 16),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                  ),
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    return _buildProductItem(
-                        context, index, products[index], products);
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductItem(BuildContext context, int index,
-      Map<String, dynamic> product, List<Map<String, dynamic>> products) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                ProductPage(product: product, index: index, products: products),
-          ),
-        );
-      },
-      child: Card(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.asset(
-              product['gambar'],
-              width: double.infinity,
-              height: 100,
-              fit: BoxFit.cover,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
+              );
+            },
+            child: Card(
+              elevation: 4,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    product['nama'],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(product['harga']),
+                  Image.asset(product.imagePath, height: 120, fit: BoxFit.cover),
+                  Text(product.name),
+                  Text('Rp ${product.price.toStringAsFixed(0)}'),
                 ],
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

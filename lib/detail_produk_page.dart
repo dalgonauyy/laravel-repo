@@ -1,120 +1,97 @@
-// ignore_for_file: unused_local_variable
-
 import 'package:flutter/material.dart';
-import 'package:myapp/beranda_page.dart';
-import 'package:myapp/checkout_page.dart';
-import 'keranjang_page.dart';
+import 'product.dart';
 
-class ProductPage extends StatelessWidget {
-  const ProductPage(
-      {Key? key,
-      required this.product,
-      required this.index,
-      required this.products})
-      : super(key: key);
+class DetailProdukPage extends StatelessWidget {
+  final Product product;
+  final Function(Product) onAddToCart;
 
-  final Map<String, dynamic> product;
-  final int index;
-  final List<Map<String, dynamic>> products;
+  const DetailProdukPage({required this.product, required this.onAddToCart});
 
   @override
   Widget build(BuildContext context) {
-    // Data produk
-    final selectedProduct = products[index];
-
-    // final String productName = 'Dress Wanita';
-    // final String imagePath =
-    //     'assets/images/dressberanda1.jpeg'; // Ganti dengan path aset gambar Anda
-    // final String description = 'Dress dengan nuansa elegan membuat  ';
-    // final String price = 'Rp. 500.000';
-
-    // Data ulasan
-    final List<Map<String, String>> reviews = [
-      {
-        'name': 'Nama Pembeli 1',
-        'review': 'Ulasan produk dari pembeli 1.',
-      },
-      {
-        'name': 'Nama Pembeli 2',
-        'review': 'Ulasan produk dari pembeli 2.',
-      },
-      // Tambahkan ulasan lainnya di sini
-    ];
-    // Data rating
-    final double rating = 4.5; // Ganti dengan rating yang sesuai
-
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => BerandaPage()));
-          },
-        ),
-        title: const Text('Detail Produk'),
-        actions: [],
-        // ... (AppBar tetap sama)
+        title: Text(product.name),
       ),
-      body: SingleChildScrollView(
+      body: SingleChildScrollView( // Membungkus konten dalam SingleChildScrollView
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(
-              selectedProduct['gambar'],
-              width: double.infinity,
-              height: 300,
-              fit: BoxFit.cover,
+            // Gambar Produk
+            Image.asset(product.imagePath, height: 250, fit: BoxFit.cover),
+
+            const SizedBox(height: 16),
+
+            // Nama dan Harga Produk
+            Text(
+              product.name,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16.0),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    selectedProduct['nama'],
-                    style: const TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+            Text(
+              'Rp ${product.price.toStringAsFixed(0)}',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Deskripsi Produk
+            const Text(
+              'Deskripsi:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text(product.description),
+            const SizedBox(height: 16),
+
+            // Ulasan dan Rating
+            const Text(
+              'Ulasan:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Row(
+              children: [
+                Icon(Icons.star, color: Colors.yellow, size: 24),
+                Text('${product.rating} (${product.reviews} reviews)'),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // Menampilkan Ulasan dari Pelanggan
+            ListView.builder(
+              itemCount: product.reviewsList.length,
+              shrinkWrap: true,  // Agar ListView tidak mengambil ruang yang berlebihan
+              physics: NeverScrollableScrollPhysics(), // Mencegah scroll pada ListView, karena sudah ada scroll di luar
+              itemBuilder: (context, index) {
+                final review = product.reviewsList[index];
+                return ListTile(
+                  title: Text(review.username),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: List.generate(review.rating, (index) => Icon(Icons.star, color: Colors.yellow, size: 16)),
+                      ),
+                      Text(review.comment),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    selectedProduct['deskripsi'],
-                    style: const TextStyle(fontSize: 16.0),
-                  ),
-                  const SizedBox(height: 16.0),
-                  Text(
-                    '${selectedProduct['harga']}',
-                    style: const TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CheckoutPage()));
-                      // Aksi untuk tombol "Beli Sekarang"
-                    },
-                    child: const Text('Beli Sekarang'),
-                  ),
-                  const SizedBox(height: 16.0),
-                  ElevatedButton(
-                    // Tombol "Masukkan ke Keranjang"
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => KeranjangPage()));
-                    },
-                    child: const Text('Masukkan ke Keranjang'),
-                  ),
-                ],
-              ),
+                );
+              },
+            ),
+
+            const SizedBox(height: 16),
+
+            // Tombol Tambah ke Keranjang
+            ElevatedButton(
+              onPressed: () {
+                // Menambahkan produk ke keranjang
+                onAddToCart(product);
+                // Menampilkan snackbar sebagai konfirmasi
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('${product.name} ditambahkan ke keranjang!')),
+                );
+              },
+              child: const Text('Masukkan ke Keranjang'),
             ),
           ],
         ),

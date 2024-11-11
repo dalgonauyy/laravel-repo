@@ -30,11 +30,13 @@ class ProsesPage extends StatelessWidget {
     // Tambahkan produk lainnya di sini
   ];
 
+  ProsesPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pesanan Sedang Diproses'),
+        title: const Text('Pesanan Sedang Diproses'),
       ),
       body: ListView.builder(
         itemCount: products.length,
@@ -43,9 +45,8 @@ class ProsesPage extends StatelessWidget {
           return ListTile(
             title: Text(product.name),
             subtitle: Text(
-              'Harga: Rp${product.price}, Jumlah: ${product.quantity}\n'
-              'Tanggal Pesanan: ${DateFormat('dd MMMM yyyy').format(product.orderDate)}'
-            ),
+                'Harga: Rp${product.price}, Jumlah: ${product.quantity}\n'
+                'Tanggal Pesanan: ${DateFormat('dd MMMM yyyy').format(product.orderDate)}'),
             trailing: Text(product.status),
           );
         },

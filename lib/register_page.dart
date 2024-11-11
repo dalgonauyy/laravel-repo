@@ -1,79 +1,90 @@
-// ignore_for_file: unused_import
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:myapp/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+  const RegisterPage({super.key});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _register() async {
+    if (_usernameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Semua field harus diisi")),
+      );
+      return;
+    }
+
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      // Simpan username ke Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user?.uid)
+          .set({
+        'username': _usernameController.text,
+        'email': _emailController.text,
+      });
+
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Pendaftaran gagal: ${e.message}")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            // Aksi saat tombol kembali ditekan (misal: Navigator.pop(context))
-          },
-        ),
-        title: const Text(
-          'Register a Glam Boutique',
-          style: TextStyle(color: Colors.black),
-        ),
+        title: const Text('Daftar'),
       ),
-      body: SingleChildScrollView(
-        // Agar konten bisa discroll jika keyboard muncul
-        padding: const EdgeInsets.all(20.0),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
+          children: [
             Center(
               child: Image.asset(
-                'assets/images/logo gbm.jpeg', // Ganti dengan path gambar Anda
+                'assets/images/logo gbm.jpeg',
                 width: 150,
                 height: 150,
               ),
             ),
-            const SizedBox(height: 30),
-            TextFormField(
-              decoration: const InputDecoration(hintText: 'Nama'),
+            TextField(
+              controller: _usernameController,
+              decoration: const InputDecoration(labelText: 'Username'),
             ),
-            const SizedBox(height: 20),
-            TextFormField(
-              decoration: const InputDecoration(hintText: 'Username'),
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
+              keyboardType: TextInputType.emailAddress,
             ),
-            const SizedBox(height: 20),
-            TextFormField(
-              decoration: const InputDecoration(hintText: 'Email'),
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
+            TextField(
+              controller: _passwordController,
+              decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
-              decoration: const InputDecoration(hintText: 'Password'),
             ),
-            const SizedBox(height: 30),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => LoginPage()));
-                  // Aksi saat tombol register ditekan
-                },
-                child: const Text('Register'),
-              ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _register,
+              child: const Text('Daftar'),
             ),
           ],
         ),

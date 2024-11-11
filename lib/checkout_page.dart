@@ -1,107 +1,106 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/pesananberhasil_page.dart';
+import 'product.dart';
 
 class CheckoutPage extends StatelessWidget {
-  const CheckoutPage({super.key});
+  final List<Product> cart;
+  final double totalAmount;
+  final Function(List<Product>) onOrderConfirmed;
+
+  CheckoutPage({
+    required this.cart,
+    required this.totalAmount,
+    required this.onOrderConfirmed,
+  });
+
+  // Fungsi untuk menampilkan dialog konfirmasi pemesanan
+  void _showOrderConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Tidak bisa menutup dialog dengan mengklik di luar dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Pemesanan Berhasil'),
+          content: const Text('Proses pemesanan Anda berhasil.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Kirim produk yang dipesan ke halaman Pemesanan
+                Navigator.of(context).pop(); // Menutup dialog
+                onOrderConfirmed(cart); // Mengirim data pesanan
+                Navigator.of(context).pop(); // Kembali ke halaman sebelumnya
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         title: const Text('Checkout'),
       ),
-      body: SingleChildScrollView(
-        // Agar konten dapat discroll jika melebihi tinggi layar
-        padding: const EdgeInsets.all(20.0),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Alamat Pengiriman
-            Text(
-              'Alamat Pengiriman',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text('Nama Penerima: Karina Darmawati'),
-            Text('Jln. Mawar no.5, Jakarta Selatan'),
-            Text('Nomor Telepon: 081234567890'),
-            SizedBox(height: 20),
-
-            // Opsi Pengiriman
-            Text(
-              'Opsi Pengiriman',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text('JNE Reguler - Rp18.000'),
-            SizedBox(height: 20),
-
-            // Detail Pesanan
-            Text(
+            const Text(
               'Detail Pesanan',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                itemCount: cart.length,
+                itemBuilder: (context, index) {
+                  final product = cart[index];
+                  return ListTile(
+                    leading: Image.asset(product.imagePath, width: 50, height: 50),
+                    title: Text(product.name),
+                    subtitle: Text('Rp ${product.price.toStringAsFixed(0)}'),
+                  );
+                },
+              ),
+            ),
+            const Divider(),
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Image.asset(
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:492085114.
-                  'assets/images/dressberanda1.jpeg', // Ganti dengan URL gambar produk
-                  width: 100,
-                  height: 100,
+                const Text(
+                  'Total Pembayaran:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Long White Dress',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text('Harga: Rp500.000'),
-                      Text('Jumlah: 1'),
-                    ],
-                  ),
+                Text(
+                  'Rp ${totalAmount.toStringAsFixed(0)}',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            SizedBox(height: 20),
-
-            // Rincian Pembayaran
-            Text(
-              'Rincian Pembayaran',
+            const SizedBox(height: 20),
+            const Text(
+              'Metode Pembayaran',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
-            Text('Subtotal: Rp500.000'),
-            Text('Ongkos Kirim: Rp18.000'),
-            Text('Total: Rp518.000'),
-            SizedBox(height: 30),
-
-            // Tombol Checkout
+            DropdownButton<String>(
+              items: [
+                const DropdownMenuItem(child: Text("Transfer Bank"), value: "bank_transfer"),
+                const DropdownMenuItem(child: Text("Kartu Kredit"), value: "credit_card"),
+              ],
+              onChanged: (value) {},
+              hint: const Text("Pilih metode pembayaran"),
+            ),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => PesananBerhasilPage()));
-                // Aksi yang dilakukan saat tombol ditekan
+                // Menampilkan dialog konfirmasi pemesanan
+                _showOrderConfirmationDialog(context);
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black, // Warna latar belakang tombol
-                foregroundColor: Colors.white, // Warna teks tombol
-              ),
-              child: const Text('Checkout'),
-            )
+              child: const Text('Konfirmasi Pesanan'),
+            ),
           ],
         ),
       ),

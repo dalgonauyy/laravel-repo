@@ -5,16 +5,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart'; // Pastikan mengimpor halaman Login yang sudah Anda buat
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Home')),
-      body: Center(child: Text('Selamat datang!')),
+      appBar: AppBar(title: const Text('Home')),
+      body: const Center(child: Text('Selamat datang!')),
     );
   }
 }
 
 class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
@@ -22,16 +26,16 @@ class AuthWrapper extends StatelessWidget {
       builder: (context, snapshot) {
         // Menampilkan loading indicator saat koneksi sedang berlangsung
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         // Jika ada data (snapshot.hasData), berarti pengguna sudah login
         if (snapshot.hasData) {
-          return HomePage(); // Tampilkan halaman utama
+          return const HomePage(); // Tampilkan halaman utama
         }
 
         // Jika tidak ada data (snapshot.data == null), berarti pengguna belum login
-        return LoginPage(); // Tampilkan halaman login
+        return const LoginPage(); // Tampilkan halaman login
       },
     );
   }

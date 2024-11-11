@@ -1,107 +1,95 @@
+// lib/pages/message_page.dart
 import 'package:flutter/material.dart';
 
-class PesanPage extends StatefulWidget {
-  const PesanPage({super.key});
-
+class MessagePage extends StatefulWidget {
   @override
-  State<PesanPage> createState() => _PesanPageState();
+  _MessagePageState createState() => _MessagePageState();
 }
 
-class _PesanPageState extends State<PesanPage> {
-  final TextEditingController _pesanController = TextEditingController();
+class _MessagePageState extends State<MessagePage> {
+  final TextEditingController _controller = TextEditingController();
+  final List<Map<String, dynamic>> _messages = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Pesan'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
+        title: Text("Pesan ke Admin Butik"),
       ),
       body: Column(
         children: [
-          // Nama Admin
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Admin Toko', // Ganti dengan nama admin
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
-
-          // Isi Pesan
           Expanded(
-            child: ListView(
-              children: [
-                // Contoh pesan dari penjual
-                _buildPesanItem(
-                    'Admin Tasya', 'Halo, pesanan Anda sedang diproses.', true),
-                // Contoh pesan dari pembeli
-                _buildPesanItem('Nana', 'Terima kasih!', false),
-                // Tambahkan pesan-pesan lain di sini
-              ],
+            child: ListView.builder(
+              padding: EdgeInsets.all(16.0),
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final message = _messages[index];
+                return _buildMessageBubble(
+                  message['text'],
+                  isUser: message['isUser'],
+                );
+              },
             ),
           ),
-
-          // Kolom untuk mengetik pesan
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _pesanController,
-                    decoration: InputDecoration(
-                      hintText: 'Ketik pesan...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    // Aksi saat tombol kirim ditekan
-                    setState(() {
-                      // Tambahkan pesan ke list
-                    });
-                    _pesanController.clear();
-                  },
-                  icon: Icon(Icons.send),
-                ),
-              ],
-            ),
-          ),
+          _buildMessageInput(),
         ],
       ),
     );
   }
 
-  Widget _buildPesanItem(String pengirim, String isiPesan, bool isPenjual) {
+  Widget _buildMessageBubble(String message, {bool isUser = true}) {
     return Align(
-      alignment: isPenjual ? Alignment.centerLeft : Alignment.centerRight,
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        padding: const EdgeInsets.all(12.0),
+        margin: EdgeInsets.symmetric(vertical: 5),
+        padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: isPenjual ? Colors.grey[300] : Colors.blue[100],
-          borderRadius: BorderRadius.circular(15.0),
+          color: isUser ? Colors.blueAccent : Colors.grey[300],
+          borderRadius: BorderRadius.circular(10),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              pengirim,
-              style: TextStyle(fontWeight: FontWeight.bold),
+        child: Text(
+          message,
+          style: TextStyle(
+            color: isUser ? Colors.white : Colors.black,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessageInput() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                hintText: "Tulis pesan...",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
             ),
-            Text(isiPesan),
-          ],
-        ),
+          ),
+          IconButton(
+            icon: Icon(Icons.send),
+            onPressed: () {
+              final text = _controller.text.trim();
+              if (text.isNotEmpty) {
+                setState(() {
+                  _messages.add({'text': text, 'isUser': true});
+                  _messages.add({
+                    'text': "Pesan Anda sudah diterima",
+                    'isUser': false,
+                  });
+                });
+                _controller.clear();
+              }
+            },
+          ),
+        ],
       ),
     );
   }

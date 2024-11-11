@@ -1,167 +1,128 @@
+// ignore_for_file: library_private_types_in_public_api, use_super_parameters
+
 import 'package:flutter/material.dart';
-import 'package:myapp/checkout_page.dart';
+import 'product.dart';
+import 'checkout_page.dart';
 
 class KeranjangPage extends StatefulWidget {
-  const KeranjangPage({Key? key}) : super(key: key);
+  final List<Product> cart;
+
+  const KeranjangPage({required this.cart, Key? key, required void Function(List<Product> cart) onCheckout}) : super(key: key);
 
   @override
-  State<KeranjangPage> createState() => _KeranjangPageState();
+  _KeranjangPageState createState() => _KeranjangPageState();
 }
 
 class _KeranjangPageState extends State<KeranjangPage> {
-  List<Map<String, dynamic>> keranjang = [
-    {
-      'nama': 'Dress Batik',
-      'gambar': 'assets/images/batik.jpg',
-      'harga': 200000,
-      'deskripsi': 'Dress batik modern dengan motif parang',
-      'jumlah': 1,
-      'isChecked': true
-    },
-    {
-      'nama': 'Long Dress',
-      'gambar': 'assets/images/dress1.jpeg',
-      'harga': 350000,
-      'deskripsi': 'Long dress elegan untuk acara formal',
-      'jumlah': 1,
-      'isChecked': true
-    },
-    {
-      'nama': 'Simple Blouse',
-      'gambar': 'assets/images/bajuberanda3.jpeg',
-      'harga': 150000,
-      'deskripsi': 'Simpel blouse dengan gaya terbaru',
-      'jumlah': 1,
-      'isChecked': false
-    },
-    {
-      'nama': 'Dress Elegan',
-      'gambar': 'assets/images/dresskeranjang1.jpeg',
-      'harga': 200000,
-      'deskripsi': 'Dress yang dibuat dengan bahan premium',
-      'jumlah': 1,
-      'isChecked': false
-    }
+  late List<Product> cart;
+  
+  get orders => null;
 
-    // ... Tambahkan produk lainnya
-  ];
+  @override
+  void initState() {
+    super.initState();
+    cart = widget.cart;
+  }
 
-  void _ubahJumlah(int index, int perubahan) {
+  void _increaseQuantity(int index) {
     setState(() {
-      keranjang[index]['jumlah'] += perubahan;
-      if (keranjang[index]['jumlah'] < 1) {
-        keranjang[index]['jumlah'] = 1;
+      cart[index].quantity += 1;
+    });
+  }
+
+  void _decreaseQuantity(int index) {
+    setState(() {
+      if (cart[index].quantity > 1) {
+        cart[index].quantity -= 1;
       }
     });
   }
 
+void _removeProduct(int index) {
+  setState(() {
+    cart.removeAt(index);
+  });
+}
+
+
   @override
   Widget build(BuildContext context) {
+    double totalAmount = cart.fold(0, (sum, item) => sum + item.price * item.quantity);
+
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text('Keranjang'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0, // Menghilangkan shadow
+        title: const Text('Keranjang'),
       ),
-      body: Container(
-        color: Colors.white, // Background putih
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: keranjang.length,
-                itemBuilder: (context, index) {
-                  final item = keranjang[index];
-                  return Card(
-                    child: ListTile(
-                      leading: Image.asset(item['gambar']),
-                      title: Text(item['nama']),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(item['deskripsi']),
-                          Text('Rp ${item['harga']}'),
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.remove),
-                                onPressed: () => _ubahJumlah(index, -1),
-                              ),
-                              Text(item['jumlah'].toString()),
-                              IconButton(
-                                icon: Icon(Icons.add),
-                                onPressed: () => _ubahJumlah(index, 1),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      trailing: Checkbox(
-                        value: item['isChecked'],
-                        onChanged: (value) {
-                          setState(() {
-                            item['isChecked'] = value;
-                          });
-                        },
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  topRight: Radius.circular(20.0),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Total: Rp ${_hitungTotal()}',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CheckoutPage()));
-                      // Aksi saat ikon pesan ditekan
+      body: cart.isEmpty
+          ? const Center(child: Text('Keranjang Anda Kosong'))
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: cart.length,
+                    itemBuilder: (context, index) {
+                      final product = cart[index];
+                      return ListTile(
+                        leading: Image.asset(product.imagePath, width: 50, height: 50),
+                        title: Text(product.name),
+                        subtitle: Text('Rp ${product.price.toStringAsFixed(0)} x ${product.quantity}'),
+                        trailing: Column(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove), iconSize: 15,
+                              onPressed: () => _decreaseQuantity(index),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.add),iconSize: 15,
+                              onPressed: () => _increaseQuantity(index),
+                        
+                            ),
+                            IconButton(
+        icon: const Icon(Icons.delete), iconSize: 15,
+        onPressed: () {
+          _removeProduct(index); 
+        },
+      ),
+                          ],
+                        ),
+                      );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Colors.black, // Warna latar belakang tombol
-                      foregroundColor: Colors.white, // Warna teks tombol
-                    ),
-                    child: const Text('Checkout'),
-                    // Aksi ketika tombol checkout ditekan
                   ),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Total: Rp ${totalAmount.toStringAsFixed(0)}',
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 17),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Navigasi ke halaman checkout dengan mengirimkan produk yang ada di keranjang
+                          Navigator.push(
+                            context,
+  MaterialPageRoute(
+    builder: (context) => CheckoutPage(
+      cart: cart,
+      totalAmount: totalAmount,
+      onOrderConfirmed: (List<Product> orderedProducts) {
+        // Tambahkan orderedProducts ke halaman Pemesanan
+        orders.addAll(orderedProducts);
+        setState(() {}); // Perbarui UI halaman Pemesanan jika diperlukan
+      },
+    ),
+  ),
+);
+                        },
+                        child: const Text('Checkout'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
     );
-  }
-
-  double _hitungTotal() {
-    double total = 0;
-    for (var item in keranjang) {
-      if (item['isChecked']) {
-        total += item['harga'] * item['jumlah'];
-      }
-    }
-    return total;
   }
 }
