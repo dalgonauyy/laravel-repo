@@ -67,6 +67,7 @@ class ProfilPage extends StatelessWidget {
                       backgroundColor: Colors.red, // Warna tombol merah
                     ),
                     child: const Text('Keluar'),
+                    
                   ),
                 ],
               ),
